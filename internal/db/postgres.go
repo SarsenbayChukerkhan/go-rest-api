@@ -2,20 +2,18 @@ package db
 
 import (
 	"database/sql"
-	"fmt"
-
-	"go-rest-api/internal/config"
+	"os"
 
 	_ "github.com/jackc/pgx/v5/stdlib"
 )
 
-func NewPostgres(cfg config.Config) (*sql.DB, error) {
-	dsn := fmt.Sprintf(
-		"host=%s port=%d user=%s password=%s dbname=%s sslmode=%s",
-		cfg.DBHost, cfg.DBPort, cfg.DBUser, cfg.DBPassword, cfg.DBName, cfg.SSLMode,
-	)
+func NewPostgresFromEnv() (*sql.DB, error) {
+	databaseURL := os.Getenv("DATABASE_URL")
+	if databaseURL == "" {
+		panic("DATABASE_URL is not set")
+	}
 
-	db, err := sql.Open("pgx", dsn)
+	db, err := sql.Open("pgx", databaseURL)
 	if err != nil {
 		return nil, err
 	}
